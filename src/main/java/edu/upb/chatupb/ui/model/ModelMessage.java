@@ -1,53 +1,35 @@
 package edu.upb.chatupb.ui.model;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.swing.*;
 
+@Getter
+@Setter
+@Builder
 public class ModelMessage {
 
-    public Icon getIcon() {
-        return icon;
-    }
+//    public void setMessage(String message) {
+//        this.message = message;
+//    }
 
-    public void setIcon(Icon icon) {
-        this.icon = icon;
-    }
+//    public ModelMessage(Icon icon, String name, String date, String message) {
+//        this.icon = icon;
+//        this.name = name;
+//        this.date = date;
+//        this.message = message;
+//    }
 
-    public String getName() {
-        return name;
-    }
+//    public ModelMessage() {
+//    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public ModelMessage(Icon icon, String name, String date, String message) {
-        this.icon = icon;
-        this.name = name;
-        this.date = date;
-        this.message = message;
-    }
-
-    public ModelMessage() {
-    }
-
+    @Getter
     private Icon icon;
     private String name;
     private String date;
     private String message;
+    private String id;
+    private String codEmisor;
 }

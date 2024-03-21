@@ -1,6 +1,7 @@
 package edu.upb.chatupb.db;
 
 import edu.upb.chatupb.server.Contact;
+import edu.upb.chatupb.ui.model.ModelMessage;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -92,7 +93,6 @@ public class ControllerDB {
         }
     }
 
-
     public void guardarMensaje(String codigoEmisor, String codigoReceptor, String mensaje, String idMensaje)  {
 
         try (Connection conn = ConnectionDB.instance.getConnection()) {
@@ -120,6 +120,33 @@ public class ControllerDB {
             e.printStackTrace();
         }
     }
+
+    public List<ModelMessage> obtenerMensajesPorContacto(String codigoPersona) {
+        try (Connection conn = ConnectionDB.instance.getConnection()) {
+            List<ModelMessage> mensajes = new ArrayList<>();
+            String query = "SELECT id_mensaje, mensaje, fecha, hora, codigo_emisor, codigo_receptor FROM mensajes WHERE codigo_emisor = ? OR codigo_receptor = ?";
+            try (PreparedStatement statement = conn.prepareStatement(query)) {
+                statement.setString(1, codigoPersona);
+                statement.setString(2, codigoPersona);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        ModelMessage mensaje = ModelMessage.builder()
+                                .id(resultSet.getString("id_mensaje"))
+                                .name(obtenerNombre(resultSet.getString("codigo_emisor")))
+                                .message(resultSet.getString("mensaje"))
+                                .date(resultSet.getDate("fecha").toString() + " " + resultSet.getTime("hora").toString())
+                                .codEmisor(resultSet.getString("codigo_emisor"))
+                                .build();
+                        mensajes.add(mensaje);
+                    }
+                }
+            }
+            return mensajes;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public void eliminarMensajes(String codigoPersona) {
         try (Connection conn = ConnectionDB.instance.getConnection()) {

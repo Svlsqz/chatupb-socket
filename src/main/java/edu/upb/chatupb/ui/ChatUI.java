@@ -24,9 +24,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -67,6 +65,8 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
             }
         }
 
+        chatArea.setChatUI(this);
+
         Mediador.addSocketEventListener(this);
         cargarContactos();
 
@@ -83,7 +83,6 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
             public void mousePressedFileButton(ActionEvent evt) {
                 JPopupMenu popup = new JPopupMenu();
                 JMenuItem pasarContacto = new JMenuItem("Pasar Contacto");
-                JMenuItem cambiarTema = new JMenuItem("Cambiar Tema");
 
                 pasarContacto.addActionListener(new ActionListener() {
                     @Override
@@ -113,47 +112,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                     }
                 });
 
-                cambiarTema.addActionListener(new ActionListener() {
-                    String tema;
-                    JPopupMenu popupTema = new JPopupMenu();
-                    JMenuItem temaDefault = new JMenuItem("Tema Default");
-                    JMenuItem temaUno = new JMenuItem("Tema Uno");
-                    JMenuItem temaDos = new JMenuItem("Tema Dos");
-                    JMenuItem temaTres = new JMenuItem("Tema Tres");
-
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        popupTema.add(temaDefault);
-                        popupTema.add(temaUno);
-                        popupTema.add(temaDos);
-                        popupTema.add(temaTres);
-
-                        switch (popupTema.getLabel()) {
-                            case "Tema Default" -> {
-                                tema = "0";
-                            }
-                            case "Tema Uno" -> {
-                                tema = "1";
-                            }
-                            case "Tema Dos" -> {
-                                tema = "2";
-                            }
-                            case "Tema Tres" -> {
-                                tema = "3";
-                            }
-                        }
-
-                        CambiarTema cambiarTema = CambiarTema.builder()
-                                .tipo("006")
-                                .codigoTema(tema)
-                                .codigoPersonaOrg("19c6e463-7439-4304-bc3d-a8b6de3c8588")
-                                .build();
-                        Mediador.sendMessage(contactoSeleccionado.getIp(), cambiarTema);
-                    }
-                });
-
                 popup.add(pasarContacto);
-                popup.add(cambiarTema);
                 JButton sourceButton = (JButton) evt.getSource();
                 popup.show(sourceButton, 0, sourceButton.getHeight());
 
@@ -201,6 +160,142 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
             }
         });
 
+//        moreButton.addActionListener(new ActionListener() {
+//
+//            JPopupMenu popup = new JPopupMenu();
+//            JPopupMenu popupTema = new JPopupMenu();
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//
+//                JMenuItem cambiarTema = new JMenuItem("Cambiar Tema");
+//
+//                cambiarTema.addActionListener(new ActionListener() {
+//                    @Override
+//                    public void actionPerformed(ActionEvent e) {
+//                        JPopupMenu popupTema = new JPopupMenu();
+//                        JMenuItem temaDefault = new JMenuItem("Tema Default");
+//                        JMenuItem temaUno = new JMenuItem("Tema Uno");
+//                        JMenuItem temaDos = new JMenuItem("Tema Dos");
+//                        JMenuItem temaTres = new JMenuItem("Tema Tres");
+//
+//                        JMenuItem sourceMenuItem = (JMenuItem) e.getSource();
+//                        popupTema.show(sourceMenuItem, 0, sourceMenuItem.getHeight());
+//
+//                        // Add action listeners to theme items
+//                        temaDefault.addActionListener(new ActionListener() {
+//                            @Override
+//                            public void actionPerformed(ActionEvent e) {
+//                                sendMessageWithTheme("0"); // Handle theme selection
+//                            }
+//                        });
+//                        // Add listeners for other theme items similarly
+//
+//                        // Add theme items to the submenu
+//                        popupTema.add(temaDefault);
+//                        popupTema.add(temaUno);
+//                        popupTema.add(temaDos);
+//                        popupTema.add(temaTres);
+//
+//                        // Show the theme submenu
+////                        JMenuItem sourceMenuItem = (JMenuItem) e.getSource();
+////                        popupTema.show(sourceMenuItem, 0, sourceMenuItem.getHeight());
+//                    }
+//                });
+//
+//                // Add the "Cambiar Tema" item to the main popup menu
+//                popup.add(cambiarTema);
+//
+//                // Show the main popup menu
+//                moreButton.requestFocusInWindow(); // Ensure moreButton has focus
+//                popup.show(moreButton, 0, moreButton.getHeight());
+//            }
+//
+//            // Method to send the message with the selected theme
+//            private void sendMessageWithTheme(String tema) {
+//                CambiarTema cambiarTema = CambiarTema.builder()
+//                        .tipo("006")
+//                        .codigoTema(tema)
+//                        .codigoPersonaOrg("19c6e463-7439-4304-bc3d-a8b6de3c8588")
+//                        .build();
+//                Mediador.sendMessage(contactoSeleccionado.getIp(), cambiarTema);
+//            }
+//        });
+
+        moreButton.addMouseListener(new MouseAdapter() {
+
+            String tema;
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    JPopupMenu popupMenu = new JPopupMenu();
+                    JMenuItem cambiarTema = new JMenuItem("Cambiar Tema");
+                    JMenuItem temaDefault = new JMenuItem("Tema Default");
+                    JMenuItem temaUno = new JMenuItem("Tema Uno");
+                    JMenuItem temaDos = new JMenuItem("Tema Dos");
+                    JMenuItem temaTres = new JMenuItem("Tema Tres");
+
+                    cambiarTema.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            // Agrega los elementos de menú a popupMenuTema
+                            popupMenu.add(temaDefault);
+                            popupMenu.add(temaUno);
+                            popupMenu.add(temaDos);
+                            popupMenu.add(temaTres);
+
+                            // Muestra el menú emergente en la posición del botón
+                            popupMenu.show(moreButton, 0, moreButton.getHeight());
+                        }
+                    });
+
+                    // Agrega el elemento de menú "Cambiar Tema" al menú emergente principal
+                    popupMenu.add(cambiarTema);
+
+                    // Agrega el listener para cada tema
+                    temaDefault.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            sendTheme("0");
+                        }
+                    });
+
+                    temaUno.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            sendTheme("1");
+                        }
+                    });
+
+                    temaDos.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            sendTheme("2");
+                        }
+                    });
+
+                    temaTres.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            sendTheme("3");
+                        }
+                    });
+
+                    // Muestra el menú emergente principal en la posición del botón
+                    popupMenu.show(moreButton, 0, moreButton.getHeight());
+                }
+            }
+
+            public void sendTheme(String tema) {
+                CambiarTema cambiarTema = CambiarTema.builder()
+                        .tipo("005")
+                        .codigoTema(tema)
+                        .codigoPersonaOrg(MYID)
+                        .build();
+                Mediador.sendMessage(contactoSeleccionado.getIp(), cambiarTema);
+            }
+        });
+
 
     }
 
@@ -219,7 +314,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
         ListaContactos = new javax.swing.JList<>();
         clearButton = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
-        moreButton = new javax.swing.JComboBox<>();
+        moreButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         inviteButton = new javax.swing.JButton();
 
@@ -242,7 +337,8 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
 
         jTextField1.setText("jTextField1");
 
-        moreButton.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        moreButton.setText("Más");
+
 
         jLabel1.setText("jLabel1");
 
@@ -448,7 +544,15 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
             String initials = InitialsIconGenerator.extractInitials(nombre);
             BufferedImage initialsIcon = InitialsIconGenerator.generateIcon(initials, 35);
             Icon icon = new ImageIcon(initialsIcon);
-            ModelMessage message = new ModelMessage(icon, nombre, df.format(db.obtenerFechaMensaje(idMensaje)), chatV2.getVersion() + " " + mensaje + " longitud: " + chatV2.getLongitudMensaje());
+
+            ModelMessage message = ModelMessage.builder()
+                    .icon(icon)
+                    .name(nombre)
+                    .date(df.format(db.obtenerFechaMensaje(idMensaje)))
+                    .message(chatV2.getVersion() + " " + mensaje + " longitud: " + chatV2.getLongitudMensaje())
+                    .id(idMensaje)
+                    .codEmisor(codigoEmisor)
+                    .build();
             chatArea.addChatBox(message, ChatBox.BoxType.LEFT);
             chatArea.clearTextAndGrabFocus();
 
@@ -473,7 +577,14 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
             String initials = InitialsIconGenerator.extractInitials(nombre);
             BufferedImage initialsIcon = InitialsIconGenerator.generateIcon(initials, 35);
             Icon icon = new ImageIcon(initialsIcon);
-            ModelMessage message = new ModelMessage(icon, nombre, df.format(db.obtenerFechaMensaje(idMensaje)), mensaje);
+            ModelMessage message = ModelMessage.builder()
+                    .icon(icon)
+                    .name(nombre)
+                    .date(df.format(db.obtenerFechaMensaje(idMensaje)))
+                    .message(mensaje)
+                    .id(idMensaje)
+                    .codEmisor(codigoEmisor)
+                    .build();
             chatArea.addChatBox(message, ChatBox.BoxType.LEFT);
             chatArea.clearTextAndGrabFocus();
 
@@ -517,6 +628,11 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
         String codigoMensaje = editarMensaje.getCodigoMensaje();
 
         db.editarMensaje(codigoMensaje, mensaje);
+
+        ChatBox chatBox = chatArea.getChatBoxById(codigoMensaje);
+
+        chatBox.updateMessage(mensaje);
+
 
         JDialog dialog = createDialog(this, "Editar Mensaje",
                 ((EditarMensaje) comando).getMensaje().toString());
@@ -698,38 +814,39 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
-
             this.contactoSeleccionado = ListaContactos.getSelectedValue();
-
-            //mayor a 0 o -1
             if (ListaContactos.getSelectedIndex() >= 0) {
-
                 contactoSeleccionado = db.obtenerContactos().get(ListaContactos.getSelectedIndex());
                 if (contactoSeleccionado == null || !contactoSeleccionado.isStateConnect()) {
-
-//                    try {
-//                        String ip = contactoSeleccionado.getIp();
-//                        // Crear una instancia de SocketClient con la información obtenida
-//                        SocketClient socketClient = new SocketClient(ip);
-//
-//                        System.out.println("Nuevo Socket");
-//                        // Iniciar un hilo
-//                        socketClient.addSocketEventListener(this);
-//                        contactoSeleccionado.setSocketClient(socketClient);
-//                        contactoSeleccionado.setStateConnect(true);
-//
-//                        Thread connectionThread = new Thread(socketClient);
-//                        connectionThread.start();
-//                    } catch (Exception ex) {
-//                        ex.printStackTrace();
-//                    }
+                    System.out.println("HI");
+                    // Obtener mensajes del contacto seleccionado
+                    System.out.println(contactoSeleccionado.getCode());
+                    List<ModelMessage> mensajes = db.obtenerMensajesPorContacto(contactoSeleccionado.getCode());
+                    System.out.println(contactoSeleccionado.getCode());
+                    System.out.println("Hello");
+                    System.out.println(mensajes.size());
+                    // Limpiar los mensajes actuales en ChatArea
+                   chatArea.clearChatBox();
+                    // Agregar los mensajes del contacto seleccionado a ChatArea
+                    for (ModelMessage mensaje : mensajes) {
+                        try {
+                            System.out.println(" si");
+                            // Determinar si el mensaje es del contacto seleccionado o del usuario actual
+                            ChatBox.BoxType tipo = (mensaje.getCodEmisor().equals(contactoSeleccionado.getCode())) ? ChatBox.BoxType.RIGHT : ChatBox.BoxType.LEFT;
+                            // Agregar el mensaje a ChatArea
+                            chatArea.addChatBox(mensaje, tipo);
+                            chatArea.clearTextAndGrabFocus();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
 
 
                 }
+                }
             }
         }
-
     }
+
 
     private static JDialog createDialog(final JFrame frame, String message) {
         final JDialog modelDialog = new JDialog(frame, "Chat",
@@ -883,13 +1000,24 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
             File image = new File(rutaImagen);
 
             Icon icon = new ImageIcon(image.getAbsolutePath());
-            ModelMessage messageSend = new ModelMessage(icon, "ChatBot", df.format(db.obtenerFechaMensaje(idMensaje)), response);
+            ModelMessage messageSend = ModelMessage.builder()
+                    .icon(icon)
+                    .name("ChatBot")
+                    .date(df.format(db.obtenerFechaMensaje(idMensaje)))
+                    .message(response)
+                    .id(idMensaje)
+                    .codEmisor(codigoEmisor)
+                    .build();
+
             chatArea.addChatBox(messageSend, ChatBox.BoxType.RIGHT);
             chatArea.clearTextAndGrabFocus();
         }
     }
+
     private void sendMessages() {
         String mensaje = chatArea.getText();
+
+        String codMensaje = UUID.randomUUID().toString();
 
 
         if (!mensaje.isEmpty() && contactoSeleccionado != null) {
@@ -900,12 +1028,12 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                         .tipo("003")
                         .version("V2")
                         .codigoPersona("19c6e463-7439-4304-bc3d-a8b6de3c8588")
-                        .codigoMensaje(UUID.randomUUID().toString())
+                        .codigoMensaje(codMensaje)
                         .longitudMensaje(String.valueOf(mensaje.length()))
                         .mensaje(mensaje)
                         .build();
 
-                System.out.println("Mensaje V2: " + chatV2.toString()) ;
+                System.out.println("Mensaje V2: " + chatV2.toString());
                 Mediador.sendMessage(contactoSeleccionado.getIp(), chatV2);
 
                 String nombre = db.obtenerNombre("19c6e463-7439-4304-bc3d-a8b6de3c8588");
@@ -913,7 +1041,14 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                 String initials = InitialsIconGenerator.extractInitials(nombre);
                 BufferedImage initialsIcon = InitialsIconGenerator.generateIcon(initials, 40);
                 Icon icon = new ImageIcon(initialsIcon);
-                ModelMessage message = new ModelMessage(icon, nombre, df.format(new Date()), chatArea.getText());
+                ModelMessage message = ModelMessage.builder()
+                        .icon(icon)
+                        .name(nombre)
+                        .date(df.format(new Date()))
+                        .message(chatArea.getText())
+                        .id(codMensaje)
+                        .codEmisor("19c6e463-7439-4304-bc3d-a8b6de3c8588")
+                        .build();
                 chatArea.addChatBox(message, ChatBox.BoxType.RIGHT);
                 chatArea.clearTextAndGrabFocus();
 
@@ -922,19 +1057,27 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                 Chat chat = Chat.builder()
                         .tipo("003")
                         .codigoPersona("19c6e463-7439-4304-bc3d-a8b6de3c8588")
-                        .codigoMensaje(UUID.randomUUID().toString())
+                        .codigoMensaje(codMensaje)
                         .mensaje(mensaje)
                         .build();
 
                 Mediador.sendMessage(contactoSeleccionado.getIp(), chat);
-
 
                 String nombre = db.obtenerNombre("19c6e463-7439-4304-bc3d-a8b6de3c8588");
 
                 String initials = InitialsIconGenerator.extractInitials(nombre);
                 BufferedImage initialsIcon = InitialsIconGenerator.generateIcon(initials, 40);
                 Icon icon = new ImageIcon(initialsIcon);
-                ModelMessage message = new ModelMessage(icon, nombre, df.format(new Date()), chatArea.getText());
+
+                ModelMessage message = ModelMessage.builder()
+                        .icon(icon)
+                        .name(nombre)
+                        .date(df.format(new Date()))
+                        .message(chatArea.getText())
+                        .id(codMensaje)
+                        .codEmisor(MYID)
+                        .build();
+
                 chatArea.addChatBox(message, ChatBox.BoxType.RIGHT);
                 chatArea.clearTextAndGrabFocus();
             }
@@ -953,15 +1096,33 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
     }
 
 
+    public void editMessage(String mensaje, String codigoMensaje) {
+
+        try {
+            EditarMensaje editarMensaje = EditarMensaje.builder()
+                    .tipo("004")
+                    .codigoMensaje(codigoMensaje)
+                    .mensaje(mensaje)
+                    .build();
+
+            db.editarMensaje(codigoMensaje, mensaje);
+
+            Mediador.sendMessage(contactoSeleccionado.getIp(), editarMensaje);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     // Variables declaration - do not modify
     private edu.upb.chatupb.ui.swing.Background background1;
     private edu.upb.chatupb.ui.components.ChatArea chatArea;
     private javax.swing.JButton clearButton;
     private javax.swing.JButton inviteButton;
-    private javax.swing.JComboBox<String> moreButton;
+    private javax.swing.JButton moreButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JList<Contact> ListaContactos;
-//    private javax.swing.JList<Contact> ListaContactos;
+    //    private javax.swing.JList<Contact> ListaContactos;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration
