@@ -27,7 +27,7 @@ public class RechazoInvitacion implements Comando {
 
     @Override
     public String generateCommand() {
-        return null;
+        return tipo + codigoPersona + System.lineSeparator();
     }
 
     public static RechazoInvitacion parseo(String message) {

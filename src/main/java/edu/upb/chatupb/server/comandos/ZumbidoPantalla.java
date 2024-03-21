@@ -25,7 +25,7 @@ public class ZumbidoPantalla implements Comando {
 
     @Override
     public String generateCommand() {
-        return null;
+        return tipo + System.lineSeparator();
     }
 
     public static ZumbidoPantalla parseo(String message) {

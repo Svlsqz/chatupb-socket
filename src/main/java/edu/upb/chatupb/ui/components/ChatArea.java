@@ -31,8 +31,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+
+import lombok.Getter;
+import lombok.Setter;
 import net.miginfocom.swing.MigLayout;
 import edu.upb.chatupb.ui.swing.ChatEvent;
+
 
 public class ChatArea extends JPanel {
 
@@ -56,7 +60,7 @@ public class ChatArea extends JPanel {
     }
 
     private void init() {
-        setOpaque(false);
+        setOpaque(true);
         layout = new MigLayout("fill, wrap, inset 0", "[fill]", "[fill,40!][fill, 100%][shrink 0,::30%]");
         header = createHeader();
         body = createBody();
@@ -102,7 +106,7 @@ public class ChatArea extends JPanel {
     private JPanel createHeader() {
         RoundPanel panel = new RoundPanel();
         panel.setLayout(new MigLayout("fill, inset 2"));
-        panel.setBackground(new Color(255, 255, 255, 20));
+        panel.setBackground(new Color(255, 255, 255, 100));
         labelTitle = new JLabel();
         labelTitle.setFont(labelTitle.getFont().deriveFont(14f));
         labelTitle.setBorder(new EmptyBorder(2, 10, 2, 2));
@@ -118,21 +122,34 @@ public class ChatArea extends JPanel {
         return panel;
     }
 
+    @Setter
+    Color colorFile1 = new Color(210, 210, 210);
+    @Setter
+    Color colorFile2 = new Color(255, 255, 255);
+
+    @Setter
+    Color colorSend1 = new Color(0, 3, 6);
+    @Setter
+    Color colorSend2 = new Color(76, 78, 78);
+
+
     private JPanel createBottom() {
         RoundPanel panel = new RoundPanel();
-        panel.setBackground(new Color(255, 255, 255, 20));
+        panel.setBackground(new Color(255, 255, 255, 100));
         panel.setLayout(new MigLayout("fill, inset 2", "[fill,34!]2[fill]2[fill,34!]", "[bottom]"));
-        GoogleMaterialIcon iconFile = new GoogleMaterialIcon(GoogleMaterialDesignIcon.ATTACH_FILE, GradientType.VERTICAL, new Color(210, 210, 210), new Color(255, 255, 255), 20);
-        GoogleMaterialIcon iconSend = new GoogleMaterialIcon(GoogleMaterialDesignIcon.SEND, GradientType.VERTICAL, new Color(0, 133, 237), new Color(90, 182, 255), 20);
+        GoogleMaterialIcon iconFile = new GoogleMaterialIcon(GoogleMaterialDesignIcon.ATTACH_FILE, GradientType.VERTICAL, colorFile1,colorFile2 , 20);
+        GoogleMaterialIcon iconSend = new GoogleMaterialIcon(GoogleMaterialDesignIcon.SEND, GradientType.VERTICAL,colorSend1 , colorSend2, 20);
         GoogleMaterialIcon iconEmot = new GoogleMaterialIcon(GoogleMaterialDesignIcon.INSERT_EMOTICON, GradientType.VERTICAL, new Color(210, 210, 210), new Color(255, 255, 255), 20);
         Button cmdFile = new Button();
         Button cmdSend = new Button();
+        cmdSend.revalidate();
         cmdFile.setFocusable(false);
         cmdSend.setFocusable(false);
         cmdFile.setIcon(iconFile.toIcon());
         cmdSend.setIcon(iconSend.toIcon());
         textMessage = new TextField();
-        textMessage.setHint("Write a message here ...");
+        textMessage.setHint("Escribe un Mensaje...");
+        textMessage.setForeground(Color.BLACK);
         textMessage.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -142,6 +159,7 @@ public class ChatArea extends JPanel {
             @Override
             public void keyTyped(KeyEvent ke) {
                 textMessage.setForeground(Color.BLACK);
+                revalidate();
                 runEventKeyTyped(ke);
             }
         });
