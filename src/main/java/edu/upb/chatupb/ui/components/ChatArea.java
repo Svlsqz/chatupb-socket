@@ -10,6 +10,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.upb.chatupb.ui.ChatUI;
 import javaswingdev.FontAwesome;
 import javaswingdev.FontAwesomeIcon;
 import javaswingdev.GoogleMaterialDesignIcon;
@@ -34,6 +36,12 @@ import edu.upb.chatupb.ui.swing.ChatEvent;
 
 public class ChatArea extends JPanel {
 
+    private ChatUI chatUI;
+
+
+    public void setChatUI(ChatUI chatUI) {
+        this.chatUI = chatUI;
+    }
     private AnimationScroll animationScroll;
     private AnimationFloatingButton animationFloatingButton;
     private List<ChatEvent> events = new ArrayList<>();
@@ -194,9 +202,9 @@ public class ChatArea extends JPanel {
     public void addChatBox(ModelMessage message, ChatBox.BoxType type) {
         int values = scrollBody.getVerticalScrollBar().getValue();
         if (type == ChatBox.BoxType.LEFT) {
-            body.add(new ChatBox(type, message), "width ::80%");
+            body.add(new ChatBox(chatUI,type, message), "width ::80%");
         } else {
-            body.add(new ChatBox(type, message), "al right,width ::80%");
+            body.add(new ChatBox(chatUI, type, message), "al right,width ::80%");
         }
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -210,6 +218,17 @@ public class ChatArea extends JPanel {
         body.revalidate();
         scrollBody.revalidate();
         scrollToBottom();
+    }
+
+
+    public ChatBox getChatBoxById(String id) {
+        for (int i = 0; i < body.getComponentCount(); i++) {
+            ChatBox box = (ChatBox) body.getComponent(i);
+            if (box.getMessage().getId().equals(id)) {
+                return box;
+            }
+        }
+        return null;
     }
 
     public void clearChatBox() {
