@@ -1,26 +1,24 @@
 
 package edu.upb.chatupb;
 
-import edu.upb.chatupb.db.ConnectionDB;
-import edu.upb.chatupb.db.MyProperties;
 import edu.upb.chatupb.server.Mediador;
 import edu.upb.chatupb.ui.ChatUI;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Sarah
  */
 public class Chatupb {
 
+    private static final Logger log = LogManager.getRootLogger();
     public static void main(String[] args) {
 
-
-//        final MyProperties myProperties = new MyProperties();
-
+        log.info("Iniciando la aplicación Chatupb");
 
         Mediador mediador = new Mediador();
         mediador.start();
-        System.out.println("Mediador iniciado");
-
+        log.info("Mediador iniciado");
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new ChatUI().setVisible(true);

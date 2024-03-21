@@ -18,6 +18,6 @@ public class Contact implements Serializable {
     private SocketClient socketClient;
 
     public String toString() {
-        return name + '\'';
+        return name;
     }
 }

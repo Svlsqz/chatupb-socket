@@ -56,6 +56,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
         initComponents();
 
 
+
         if (chatServer == null) {
             try {
                 this.chatServer = new ChatServer(this);
@@ -132,6 +133,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
             }
         });
 
+
         screenBuzzTimer = new Timer(50, new ActionListener() {
             private int count = 0;
 
@@ -161,16 +163,26 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
         });
 
         moreButton.addMouseListener(new MouseAdapter() {
-
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     JPopupMenu popupMenu = new JPopupMenu();
+                    JMenuItem zumbido = new JMenuItem("Zumbido");
                     JMenuItem cambiarTema = new JMenuItem("Cambiar Tema");
                     JMenuItem temaDefault = new JMenuItem("Tema Default");
                     JMenuItem temaUno = new JMenuItem("Tema Uno");
                     JMenuItem temaDos = new JMenuItem("Tema Dos");
                     JMenuItem temaTres = new JMenuItem("Tema Tres");
+
+                    zumbido.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            ZumbidoPantalla zumbidoPantalla = ZumbidoPantalla.builder()
+                                    .tipo("009")
+                                    .build();
+                            Mediador.sendMessage(contactoSeleccionado.getIp(), zumbidoPantalla);
+                        }
+                    });
 
                     cambiarTema.addActionListener(new ActionListener() {
                         @Override
@@ -187,13 +199,14 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                     });
 
                     // Agrega el elemento de menú "Cambiar Tema" al menú emergente principal
+                    popupMenu.add(zumbido);
+
                     popupMenu.add(cambiarTema);
 
                     // Agrega el listener para cada tema
                     temaDefault.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            TemaDefault temaDefault = new TemaDefault(ChatUI.this);
                             sendTheme("0");
                         }
                     });
@@ -201,7 +214,6 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                     temaUno.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            TemaUno temaUno = new TemaUno(ChatUI.this);
                             sendTheme("1");
                         }
                     });
@@ -209,7 +221,6 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                     temaDos.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            TemaDos temaDos = new TemaDos(ChatUI.this);
                             sendTheme("2");
                         }
                     });
@@ -217,7 +228,6 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                     temaTres.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            TemaTres temaTres = new TemaTres(ChatUI.this);
                             sendTheme("3");
                         }
                     });
@@ -240,8 +250,14 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
         clearButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                deleteHistory();
-                cargarMensajes();
+                BorrarHistorial borrarHistorial = BorrarHistorial.builder()
+                        .tipo("006")
+                        .codigoPersona(MYID)
+                        .build();
+                Mediador.sendMessage(contactoSeleccionado.getIp(), borrarHistorial);
+
+                db.eliminarMensajes(contactoSeleccionado.getCode());
+                chatArea.clearChatBox();
             }
         });
 
@@ -357,6 +373,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>
 
     /**
@@ -441,7 +458,12 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
 
             }
             default -> { // En caso de rechazo y cerrar la invitacion
-                onRejectedInvitation(comando);
+                RechazoInvitacion rechazar = RechazoInvitacion.builder()
+                        .tipo("010")
+                        .codigoPersona(MYID)
+                        .build();
+
+                Mediador.sendMessage(contacto.getIp(), rechazar);
 
             }
         }
@@ -542,7 +564,30 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
         }
+
+
+//        Chat chat = (Chat) comando;
+//
+//        String mensaje = chat.getMensaje();
+//        String codigoEmisor = chat.getCodigoPersona();
+//        String codigoReceptor = "19c6e463-7439-4304-bc3d-a8b6de3c8588";
+//        String idMensaje = chat.getCodigoMensaje();
+//
+//        db.guardarMensaje(codigoEmisor, codigoReceptor, mensaje, idMensaje);
+//
+//        String nombre = db.obtenerNombre(codigoEmisor);
+//
+//        String initials = InitialsIconGenerator.extractInitials(nombre);
+//        BufferedImage initialsIcon = InitialsIconGenerator.generateIcon(initials, 35);
+//        Icon icon = new ImageIcon(initialsIcon);
+//        ModelMessage message = new ModelMessage(icon, nombre, df.format(db.obtenerFechaMensaje(idMensaje)), mensaje);
+//        chatArea.addChatBox(message, ChatBox.BoxType.LEFT);
+//        chatArea.clearTextAndGrabFocus();
+//
+//        autoRespondClima(Arrays.asList(chat));
+
     }
 
     @Override
@@ -560,11 +605,8 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
         chatBox.updateMessage(mensaje);
 
 
-        JDialog dialog = createDialog(this, "Editar Mensaje",
-                ((EditarMensaje) comando).getMensaje().toString());
-        dialog.show();
-
     }
+
 
     @Override
     public void onChangeTheme(Comando comando) {
@@ -590,17 +632,17 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                 temaActual = temaTres;
             }
         }
-
     }
 
     @Override
     public void onDeleteHistory(Comando comando) {
 
         BorrarHistorial borrarHistorial = (BorrarHistorial) comando;
-        if (!borrarHistorial.getCodigoPersona().equals(MYID)) {
-            db.eliminarMensajes(borrarHistorial.getCodigoPersona());
-            cargarMensajes();
-        }
+
+        db.eliminarMensajes(borrarHistorial.getCodigoPersona());
+
+        chatArea.clearChatBox();
+
 
     }
 
@@ -639,7 +681,11 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
 
             }
             default -> { // En caso de rechazo y cerrar la invitacion
-                onRejectedInvitation(comando);
+                RechazoInvitacion rechazar = RechazoInvitacion.builder()
+                        .tipo("010")
+                        .codigoPersona(MYID)
+                        .build();
+                Mediador.sendMessage(contacto.getIp(), rechazar);
 
             }
         }
@@ -664,17 +710,23 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
 
     }
 
-
     @Override
     public void onRejectedInvitation(Comando comando) {
         JDialog dialog = createDialog(this, "Rechazo de invitacion",
-                ((RechazoInvitacion) comando).toString());
+                "Invitacion rechazada");
         dialog.show();
 
     }
 
     @Override
     public void onSearch(Comando comando) {
+        Search search = Search.builder()
+                .tipo("008")
+                .codigoPersona(MYID)
+                .nombre("Sarah Aranibar")
+                .build();
+
+        Mediador.sendMessage(contactoSeleccionado.getIp(), search);
 
     }
 
@@ -727,7 +779,6 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
 
         return modelDialog;
     }
-
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
@@ -735,51 +786,33 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
             if (ListaContactos.getSelectedIndex() >= 0) {
                 contactoSeleccionado = db.obtenerContactos().get(ListaContactos.getSelectedIndex());
                 if (contactoSeleccionado == null || !contactoSeleccionado.isStateConnect()) {
-                    cargarMensajes();
+                    System.out.println("HI");
+                    // Obtener mensajes del contacto seleccionado
+                    System.out.println(contactoSeleccionado.getCode());
+                    List<ModelMessage> mensajes = db.obtenerMensajesPorContacto(contactoSeleccionado.getCode());
+                    System.out.println(contactoSeleccionado.getCode());
+                    System.out.println("Hello");
+                    System.out.println(mensajes.size());
+                    // Limpiar los mensajes actuales en ChatArea
+                    chatArea.clearChatBox();
+                    // Agregar los mensajes del contacto seleccionado a ChatArea
+                    for (ModelMessage mensaje : mensajes) {
+                        try {
+                            System.out.println(" si");
+                            // Determinar si el mensaje es del contacto seleccionado o del usuario actual
+                            ChatBox.BoxType tipo = (mensaje.getCodEmisor().equals(contactoSeleccionado.getCode())) ? ChatBox.BoxType.RIGHT : ChatBox.BoxType.LEFT;
+                            // Agregar el mensaje a ChatArea
+                            chatArea.addChatBox(mensaje, tipo);
+                            chatArea.clearTextAndGrabFocus();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+
+                    }
                 }
             }
         }
-    }
-
-    private void cargarMensajes() {
-
-        List<ModelMessage> mensajes = db.obtenerMensajesPorContacto(contactoSeleccionado.getCode());
-        System.out.println(contactoSeleccionado.getCode());
-        chatArea.clearChatBox();
-        for (ModelMessage mensaje : mensajes) {
-            try {
-                ChatBox.BoxType tipo = (mensaje.getCodEmisor().equals(contactoSeleccionado.getCode())) ? ChatBox.BoxType.RIGHT : ChatBox.BoxType.LEFT;
-                chatArea.addChatBox(mensaje, tipo);
-                chatArea.clearTextAndGrabFocus();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
-
-
-    private static JDialog createDialog(final JFrame frame, String message) {
-        final JDialog modelDialog = new JDialog(frame, "Chat",
-                Dialog.ModalityType.DOCUMENT_MODAL);
-        modelDialog.setBounds(132, 132, 300, 200);
-        Container dialogContainer = modelDialog.getContentPane();
-        dialogContainer.setLayout(new BorderLayout());
-        dialogContainer.add(new JLabel(message),
-                BorderLayout.CENTER);
-        JPanel panel1 = new JPanel();
-        panel1.setLayout(new FlowLayout());
-        JButton okButton = new JButton("Ok");
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                modelDialog.setVisible(false);
-            }
-        });
-
-        panel1.add(okButton);
-        dialogContainer.add(panel1, BorderLayout.SOUTH);
-
-        return modelDialog;
     }
 
     private Contact seleccionarContacto(ContactCollection<Contact> contacts) {
@@ -1004,6 +1037,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
 
         Mediador.sendMessage(contactoSeleccionado.getIp(), borrarHistorial);
     }
+
 
     public void editMessage(String mensaje, String codigoMensaje) {
 
