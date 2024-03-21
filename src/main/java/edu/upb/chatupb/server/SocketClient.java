@@ -36,10 +36,7 @@ public class SocketClient extends Thread {
     private final String SEARCH = "008";
     private final String ZUMBIDO_PANTALLA = "009";
     private final String RECHAZO_INVITACION = "010";
-    //
-    private final String INVITACION_ARCHIVO = "011"; //tipo nombre
-    private final String ARCHIVO = "012";
-    private final String TERMINAR_ENVIO_ARCHIVO = "013";
+
 
     private Socket socket;
     @Getter
