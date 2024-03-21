@@ -26,9 +26,11 @@ public class CambiarTema implements Comando {
         return this.tipo;
     }
 
+    //TODO: Cambiar el tipo de retorno
+
     @Override
     public String generateCommand() {
-        return null;
+        return tipo + codigoTema + codigoPersonaOrg + System.lineSeparator();
     }
 
     public static CambiarTema parseo(String message) {

@@ -14,15 +14,20 @@ public class TemaDefault implements Tema{
 
     public TemaDefault(ChatUI chatUI) {
 
-        Color nuevoColorHeader = new Color(255, 0, 0);  // Ejemplo: Rojo brillante
-        Color nuevoColorBody = new Color(0, 255, 0);    // Ejemplo: Verde brillante
-        Color nuevoColorBottom = new Color(0, 0, 255);  // Ejemplo: Azul brillante
+        chatUI.getChatArea().setOpaque(true);
+        chatUI.getChatArea().setBackground( new Color(9, 71, 84, 255));
+        chatUI.getChatArea().setForeground(Color.WHITE);
 
-        UIManager.put("Panel.header", new ColorUIResource(nuevoColorHeader));
+        Color nuevoColorFuerte = new Color(4, 34, 59, 255);
+        Color nuevoColorSuave = new Color(56, 90, 102, 233);
 
-        UIManager.put("Panel.body", new ColorUIResource(nuevoColorBody));
 
-        UIManager.put("Panel.bottom", new ColorUIResource(nuevoColorBottom));
+        chatUI.getBackground1().setColor1(nuevoColorFuerte);
+        chatUI.getBackground1().setColor2(nuevoColorSuave);
+
+        chatUI.getChatArea().repaint();
+
+        chatUI.getChatArea().revalidate();
 
         SwingUtilities.updateComponentTreeUI(chatUI);
 
