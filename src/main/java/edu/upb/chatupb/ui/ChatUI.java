@@ -55,7 +55,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
     public ChatUI() {
         initComponents();
 
-        temaActual = new TemaDefault(this);
+
 
         if (chatServer == null) {
             try {
