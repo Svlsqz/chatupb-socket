@@ -178,7 +178,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             ZumbidoPantalla zumbidoPantalla = ZumbidoPantalla.builder()
-                                    .tipo("008")
+                                    .tipo("009")
                                     .build();
                             Mediador.sendMessage(contactoSeleccionado.getIp(), zumbidoPantalla);
                         }
@@ -373,6 +373,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>
 
     /**
@@ -457,7 +458,12 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
 
             }
             default -> { // En caso de rechazo y cerrar la invitacion
-                onRejectedInvitation(comando);
+                RechazoInvitacion rechazar = RechazoInvitacion.builder()
+                        .tipo("010")
+                        .codigoPersona(MYID)
+                        .build();
+
+                Mediador.sendMessage(contacto.getIp(), rechazar);
 
             }
         }
@@ -599,10 +605,6 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
         chatBox.updateMessage(mensaje);
 
 
-        JDialog dialog = createDialog(this, "Editar Mensaje",
-                ((EditarMensaje) comando).getMensaje().toString());
-        dialog.show();
-
     }
 
 
@@ -630,10 +632,6 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                 temaActual = temaTres;
             }
         }
-
-        JDialog dialog = createDialog(this, "Cambio de tema",
-                "Tema cambiado a " + tema);
-        dialog.show();
     }
 
     @Override
@@ -641,14 +639,10 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
 
         BorrarHistorial borrarHistorial = (BorrarHistorial) comando;
 
-        System.out.println(borrarHistorial.getCodigoPersona());
-
         db.eliminarMensajes(borrarHistorial.getCodigoPersona());
-        //falta
 
-        JDialog dialog = createDialog(this, "Borrar Chat",
-                "Chat borrado");
-        dialog.show();
+        chatArea.clearChatBox();
+
 
     }
 
@@ -687,7 +681,11 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
 
             }
             default -> { // En caso de rechazo y cerrar la invitacion
-                onRejectedInvitation(comando);
+                RechazoInvitacion rechazar = RechazoInvitacion.builder()
+                        .tipo("010")
+                        .codigoPersona(MYID)
+                        .build();
+                Mediador.sendMessage(contacto.getIp(), rechazar);
 
             }
         }
@@ -712,17 +710,23 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
 
     }
 
-
     @Override
     public void onRejectedInvitation(Comando comando) {
         JDialog dialog = createDialog(this, "Rechazo de invitacion",
-                ((RechazoInvitacion) comando).toString());
+                "Invitacion rechazada");
         dialog.show();
 
     }
 
     @Override
     public void onSearch(Comando comando) {
+        Search search = Search.builder()
+                .tipo("008")
+                .codigoPersona(MYID)
+                .nombre("Sarah Aranibar")
+                .build();
+
+        Mediador.sendMessage(contactoSeleccionado.getIp(), search);
 
     }
 
@@ -775,7 +779,6 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
 
         return modelDialog;
     }
-
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
@@ -791,7 +794,7 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                     System.out.println("Hello");
                     System.out.println(mensajes.size());
                     // Limpiar los mensajes actuales en ChatArea
-                   chatArea.clearChatBox();
+                    chatArea.clearChatBox();
                     // Agregar los mensajes del contacto seleccionado a ChatArea
                     for (ModelMessage mensaje : mensajes) {
                         try {
@@ -806,35 +809,10 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                         }
 
 
-                }
+                    }
                 }
             }
         }
-    }
-
-
-    private static JDialog createDialog(final JFrame frame, String message) {
-        final JDialog modelDialog = new JDialog(frame, "Chat",
-                Dialog.ModalityType.DOCUMENT_MODAL);
-        modelDialog.setBounds(132, 132, 300, 200);
-        Container dialogContainer = modelDialog.getContentPane();
-        dialogContainer.setLayout(new BorderLayout());
-        dialogContainer.add(new JLabel(message),
-                BorderLayout.CENTER);
-        JPanel panel1 = new JPanel();
-        panel1.setLayout(new FlowLayout());
-        JButton okButton = new JButton("Ok");
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                modelDialog.setVisible(false);
-            }
-        });
-
-        panel1.add(okButton);
-        dialogContainer.add(panel1, BorderLayout.SOUTH);
-
-        return modelDialog;
     }
 
     private Contact seleccionarContacto(ContactCollection<Contact> contacts) {

@@ -96,9 +96,9 @@ public class SocketClient extends Thread {
                     case PASAR_CONTACTO -> {
                         Mediador.sendEventPassContact(PasarContacto.parseo(message));
                     }
-//                    case SEARCH -> {
-//                        Mediador.sendEventSearch(Search.parseo(message));
-//                    }
+                    case SEARCH -> {
+                        Mediador.sendEventSearch(Search.parseo(message));
+                    }
                     case ZUMBIDO_PANTALLA -> {
                         Mediador.sendEventScreenBuzz(ZumbidoPantalla.parseo(message));
                     }
