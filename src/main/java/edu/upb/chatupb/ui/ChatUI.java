@@ -55,6 +55,8 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
     public ChatUI() {
         initComponents();
 
+        temaActual = new TemaDefault(this);
+
         if (chatServer == null) {
             try {
                 this.chatServer = new ChatServer(this);
@@ -160,80 +162,27 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
             }
         });
 
-//        moreButton.addActionListener(new ActionListener() {
-//
-//            JPopupMenu popup = new JPopupMenu();
-//            JPopupMenu popupTema = new JPopupMenu();
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//
-//                JMenuItem cambiarTema = new JMenuItem("Cambiar Tema");
-//
-//                cambiarTema.addActionListener(new ActionListener() {
-//                    @Override
-//                    public void actionPerformed(ActionEvent e) {
-//                        JPopupMenu popupTema = new JPopupMenu();
-//                        JMenuItem temaDefault = new JMenuItem("Tema Default");
-//                        JMenuItem temaUno = new JMenuItem("Tema Uno");
-//                        JMenuItem temaDos = new JMenuItem("Tema Dos");
-//                        JMenuItem temaTres = new JMenuItem("Tema Tres");
-//
-//                        JMenuItem sourceMenuItem = (JMenuItem) e.getSource();
-//                        popupTema.show(sourceMenuItem, 0, sourceMenuItem.getHeight());
-//
-//                        // Add action listeners to theme items
-//                        temaDefault.addActionListener(new ActionListener() {
-//                            @Override
-//                            public void actionPerformed(ActionEvent e) {
-//                                sendMessageWithTheme("0"); // Handle theme selection
-//                            }
-//                        });
-//                        // Add listeners for other theme items similarly
-//
-//                        // Add theme items to the submenu
-//                        popupTema.add(temaDefault);
-//                        popupTema.add(temaUno);
-//                        popupTema.add(temaDos);
-//                        popupTema.add(temaTres);
-//
-//                        // Show the theme submenu
-////                        JMenuItem sourceMenuItem = (JMenuItem) e.getSource();
-////                        popupTema.show(sourceMenuItem, 0, sourceMenuItem.getHeight());
-//                    }
-//                });
-//
-//                // Add the "Cambiar Tema" item to the main popup menu
-//                popup.add(cambiarTema);
-//
-//                // Show the main popup menu
-//                moreButton.requestFocusInWindow(); // Ensure moreButton has focus
-//                popup.show(moreButton, 0, moreButton.getHeight());
-//            }
-//
-//            // Method to send the message with the selected theme
-//            private void sendMessageWithTheme(String tema) {
-//                CambiarTema cambiarTema = CambiarTema.builder()
-//                        .tipo("006")
-//                        .codigoTema(tema)
-//                        .codigoPersonaOrg("19c6e463-7439-4304-bc3d-a8b6de3c8588")
-//                        .build();
-//                Mediador.sendMessage(contactoSeleccionado.getIp(), cambiarTema);
-//            }
-//        });
-
         moreButton.addMouseListener(new MouseAdapter() {
-
-            String tema;
-
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     JPopupMenu popupMenu = new JPopupMenu();
+                    JMenuItem zumbido = new JMenuItem("Zumbido");
                     JMenuItem cambiarTema = new JMenuItem("Cambiar Tema");
                     JMenuItem temaDefault = new JMenuItem("Tema Default");
                     JMenuItem temaUno = new JMenuItem("Tema Uno");
                     JMenuItem temaDos = new JMenuItem("Tema Dos");
                     JMenuItem temaTres = new JMenuItem("Tema Tres");
+
+                    zumbido.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            ZumbidoPantalla zumbidoPantalla = ZumbidoPantalla.builder()
+                                    .tipo("008")
+                                    .build();
+                            Mediador.sendMessage(contactoSeleccionado.getIp(), zumbidoPantalla);
+                        }
+                    });
 
                     cambiarTema.addActionListener(new ActionListener() {
                         @Override
@@ -250,6 +199,8 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                     });
 
                     // Agrega el elemento de menú "Cambiar Tema" al menú emergente principal
+                    popupMenu.add(zumbido);
+
                     popupMenu.add(cambiarTema);
 
                     // Agrega el listener para cada tema
@@ -293,6 +244,20 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
                         .codigoPersonaOrg(MYID)
                         .build();
                 Mediador.sendMessage(contactoSeleccionado.getIp(), cambiarTema);
+            }
+        });
+
+        clearButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BorrarHistorial borrarHistorial = BorrarHistorial.builder()
+                        .tipo("006")
+                        .codigoPersona(MYID)
+                        .build();
+                Mediador.sendMessage(contactoSeleccionado.getIp(), borrarHistorial);
+
+                db.eliminarMensajes(contactoSeleccionado.getCode());
+                chatArea.clearChatBox();
             }
         });
 
