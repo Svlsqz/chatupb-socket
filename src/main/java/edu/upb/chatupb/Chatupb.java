@@ -1,6 +1,8 @@
 
 package edu.upb.chatupb;
 
+import edu.upb.chatupb.db.ConnectionDB;
+import edu.upb.chatupb.db.MyProperties;
 import edu.upb.chatupb.server.Mediador;
 import edu.upb.chatupb.ui.ChatUI;
 
@@ -10,6 +12,9 @@ import edu.upb.chatupb.ui.ChatUI;
 public class Chatupb {
 
     public static void main(String[] args) {
+
+        MyProperties.getInstance();
+
         Mediador mediador = new Mediador();
         mediador.start();
         System.out.println("Mediador iniciado");

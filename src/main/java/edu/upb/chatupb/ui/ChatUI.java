@@ -57,20 +57,20 @@ public class ChatUI extends javax.swing.JFrame implements SocketEvent, ListSelec
     public ChatUI() {
         initComponents();
 
-//        if (chatServer == null) {
-//            try {
-//                this.chatServer = new ChatServer(this);
-//                this.chatServer.start();
-//            } catch (Exception e) {
-//                System.exit(-1);
-//
-//            }
-//        }
-//
-//        Mediador.addSocketEventListener(this);
-//        cargarContactos();
-//
-//        ListaContactos.addListSelectionListener(this);
+        if (chatServer == null) {
+            try {
+                this.chatServer = new ChatServer(this);
+                this.chatServer.start();
+            } catch (Exception e) {
+                System.exit(-1);
+
+            }
+        }
+
+        Mediador.addSocketEventListener(this);
+        cargarContactos();
+
+        ListaContactos.addListSelectionListener(this);
 
 
         chatArea.addChatEvent(new ChatEvent() {
