@@ -13,7 +13,9 @@ public class Chatupb {
 
     public static void main(String[] args) {
 
-        MyProperties.getInstance();
+
+//        final MyProperties myProperties = new MyProperties();
+
 
         Mediador mediador = new Mediador();
         mediador.start();

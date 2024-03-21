@@ -1,18 +1,14 @@
 package edu.upb.chatupb.db;
 
-import lombok.Getter;
-
 import java.io.IOException;
 import java.util.Properties;
 
 public class MyProperties {
 
-    @Getter
-    private static MyProperties instance = new MyProperties();
+    static {
 
-    private MyProperties() {
-        // Load properties from the configuration file
         Properties p = new Properties();
+
         try {
             p.load(MyProperties.class.getResourceAsStream("/etc/config.properties"));
 
@@ -23,6 +19,7 @@ public class MyProperties {
             ConnectionDB.instance.setUp(url, user, password);
 
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }

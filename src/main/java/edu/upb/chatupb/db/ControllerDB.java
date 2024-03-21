@@ -29,6 +29,7 @@ public class ControllerDB {
 
         try (Connection conn = ConnectionDB.instance.getConnection()) {
 
+
             List<Contact> contactos = new ArrayList<>();
 
             String query = "SELECT * FROM contactos";
