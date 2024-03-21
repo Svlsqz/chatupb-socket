@@ -29,13 +29,13 @@ public class BorrarHistorial implements Comando {
 
     @Override
     public String generateCommand() {
-        return null;
+        return tipo + codigoPersona + System.lineSeparator();
     }
 
     public static BorrarHistorial parseo(String message) {
         BorrarHistorial contacto = new BorrarHistorial();
         String comando = message.substring(0,3);
-        String codigoPersona = message.substring(4);
+        String codigoPersona = message.substring(3);
 
         contacto.tipo = comando;
         contacto.codigoPersona = codigoPersona;
